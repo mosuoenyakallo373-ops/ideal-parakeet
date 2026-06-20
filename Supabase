@@ -1,0 +1,89 @@
+1. Install package
+Run this command to install the required dependencies.
+Details:
+npm install @supabase/supabase-js
+Code:
+File: Code
+```
+npm install @supabase/supabase-js
+```
+
+2. Add files
+Copy the following code into your project.
+Code:
+File: .env.local
+```
+EXPO_PUBLIC_SUPABASE_URL=https://qhucglktcnjwpuglfqyp.supabase.co
+EXPO_PUBLIC_SUPABASE_KEY=sb_publishable_v7mO2RO5MijLPoSpsp90hg_9Ymyx1tm
+```
+
+File: utils/supabase.ts
+```
+1import AsyncStorage from '@react-native-async-storage/async-storage'
+2import { createClient } from '@supabase/supabase-js'
+3
+4export const supabase = createClient(
+5  process.env.EXPO_PUBLIC_SUPABASE_URL!,
+6  process.env.EXPO_PUBLIC_SUPABASE_KEY!,
+7  {
+8    auth: {
+9      storage: AsyncStorage,
+10      autoRefreshToken: true,
+11      persistSession: true,
+12      detectSessionInUrl: false,
+13    },
+14  })
+```
+
+File: App.tsx
+```
+1import React, { useState, useEffect } from 'react';
+2import { View, Text, FlatList } from 'react-native';
+3import { supabase } from '../utils/supabase';
+4
+5export default function App() {
+6  const [todos, setTodos] = useState([]);
+7
+8  useEffect(() => {
+9    const getTodos = async () => {
+10      try {
+11        const { data: todos, error } = await supabase.from('todos').select();
+12
+13        if (error) {
+14          console.error('Error fetching todos:', error.message);
+15          return;
+16        }
+17
+18        if (todos && todos.length > 0) {
+19          setTodos(todos);
+20        }
+21      } catch (error) {
+22        console.error('Error fetching todos:', error.message);
+23      }
+24    };
+25
+26    getTodos();
+27  }, []);
+28
+29  return (
+30    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+31      <Text>Todo List</Text>
+32      <FlatList
+33        data={todos}
+34        keyExtractor={(item) => item.id.toString()}
+35        renderItem={({ item }) => <Text key={item.id}>{item.name}</Text>}
+36      />
+37    </View>
+38  );
+39};
+```
+
+3. Install Agent Skills (Optional)
+Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.
+Details:
+npx skills add supabase/agent-skills
+Code:
+File: Code
+```
+npx skills add supabase/agent-skills
+```
